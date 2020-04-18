@@ -1,0 +1,33 @@
+Exercice 1 :
+
+Q2) On peut créer n factoriel anneaux unidirectionnels.
+
+Exercice 2 :
+
+Q1)
+
+• Chaque nœud a un identifiant unique et sait que les identifiants
+sont uniques
+• Chaque nœud connaît son voisin
+• Le nombre de nœuds dans le système est inconnu de chaque
+nœud 
+
+
+
+Q3)
+
+Meilleure cas = n
+Pire cas = n^2
+Nb moyen : n*log(n)
+
+Q4)
+
+
+Ex3 
+
+
+Q2) 
+
+-Faire le tour de l'anneau pour connaitre la taille N
+-Une fois la taille connu, construire un tableau d'entier de taille N
+-Pour chaque noeud, attribuer un entier du tableau puis le supprimer du tableau. Puis send le tableau au prochain.
