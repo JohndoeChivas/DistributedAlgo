@@ -5,6 +5,7 @@ Q2) On peut créer n factoriel anneaux unidirectionnels.
 
 EXERCICE 2
 
+
 Q1)
 
 - Chaque nœud a un identifiant unique et sait que les identifiants sont uniques
@@ -14,17 +15,25 @@ Q1)
 
 Q3)
 
-Meilleure cas = 2n donc 
-Pire cas = n^2
-Nb moyen : 
+Sur 100 executions de 20 noeuds : 
+-Meilleur cas : 75 messages échangés au total
+-Pire cas : 123 messages échangés au total
+-Moyenne : 92 messages échangés en moyenne
+
+Remarque : 
+Pour la question 3, j'ai transformé mon main en une fonction maintwo qui retourne le nombre total de message d'une execution et modifié également la fonction receiveAllFinalization.
+Enfin j'ai créer une fonction main a la fin de mon code qui s'occupe de simuler les 100 executions et calculer le min, max et moyenne de ces 100 executions.
 
 Q4)
 
-Meilleur cas:
-Pire cas: 
+Meilleur cas: 2^n
+Pire cas: 1+2+3+4+...+n
+d'apres CM :)
 
 
 EXERCICE 3
+
+Remarque : L'anneau est bidirectionnel à cause de la modification dans l'exercice 4 mais dans le code pour cette question, les processus se conduisent comme s'ils constituaient un anneau unidirectionnel.
 
 
 Q2) 
@@ -38,6 +47,6 @@ Q2)
 
 EXERCICE 4 
 
-Remarque pour l'arbre binaire et la grille : obligé d'envoyer 2 fils pour l'AB et 4 voisins pour la grille, même si au reçu les processus initialise le nombre de fils et le nombre de voisins en fonction de l'indice i pour l'arbre binaire, et de l'indice i et j pour la grille.
+Remarque pour l'arbre binaire et la grille : obligé d'envoyer 2 fils pour l'AB et 4 voisins pour la grille, même si au reçu les processus initialise le nombre de fils et le nombre de voisins en fonction de l'indice i reçu pour l'arbre binaire, et des indices i et j reçus pour la grille.
 
 

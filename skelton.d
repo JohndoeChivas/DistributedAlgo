@@ -7,6 +7,7 @@ module exskeleton;
     import std.algorithm;
     import std.random;
 
+
     struct CancelMessage{}
 
 
@@ -24,11 +25,23 @@ module exskeleton;
     
     
 
-    void receiveAllFinalization(Noeud [] childTid)
-    {
+    int receiveAllFinalization(Noeud [] childTid)
+    {   
+ 
+        
+        int nbMessage = 0;
         for(int i=0 ; i<childTid.length ; ++i)
-            receiveOnly!CancelMessage();
+            nbMessage += receiveOnly!int;
+      
+        
+        writeln("Nb messages total: ",nbMessage);
+        writeln("Moyenne : ",nbMessage / childTid.length,"\r\n");
+        return  nbMessage;
+        
+                
+            
     }
+    
 
     
 
@@ -41,19 +54,6 @@ module exskeleton;
 
         // Fils droit et fils gauche 
         Noeud fg,fd;
-
-
-
-
-        
-
-
-        
-    
-
-
-        
-        
         
         
         
@@ -76,19 +76,6 @@ module exskeleton;
         );
 
 
-        
-
-        
-
-     
-
-        
-        
-   
-
-
-
-
 
        
        
@@ -104,7 +91,7 @@ module exskeleton;
                 localNeighbor.previousId = myId;
                 localPrevious.nextId = myId;
                 /* résumé */
-                writeln("[Son Process ",myId,"]: ",localPrevious.lid," est l'ID du voisin precedent et ",localNeighbor.lid," est l'ID du voisin suivant");
+                writeln("[Son process bidirectional ",myId,"]: ",localPrevious.lid," est l'ID du voisin precedent et ",localNeighbor.lid," est l'ID du voisin suivant");
                 
                 
             }
@@ -125,16 +112,16 @@ module exskeleton;
                 /* cas spécifique pour une taille de l'arbre n < 4 */
 
                 if(taille == 1){
-                    writeln("[Son process ",myId,"]: Je suis une feuille") ;
+                    writeln("[Son process AB ",myId,"]: Je suis une feuille") ;
                 }
 
                 else if(taille == 2){
                     if(i == 0){
                         fg = cast(Noeud)filsg;
-                        writeln("[Son process ",myId,"]: Fils gauche ",fg.lid);
+                        writeln("[Son process AB ",myId,"]: Fils gauche ",fg.lid);
                     }
                     else{
-                        writeln("[Son process ",myId,"]: Je suis une feuille");
+                        writeln("[Son process AB ",myId,"]: Je suis une feuille");
 
                     }
 
@@ -144,10 +131,10 @@ module exskeleton;
                     if(i == 0){
                         fg = cast(Noeud)filsg;
                         fd = cast(Noeud)filsd;
-                        writeln("[Son process ",myId,"]: Fils gauche ",fg.lid," et fils droit ",fd.lid);
+                        writeln("[Son process AB ",myId,"]: Fils gauche ",fg.lid," et fils droit ",fd.lid);
                     }
                     else{
-                        writeln("[Son process ",myId,"]: Je suis une feuille");
+                        writeln("[Son process AB ",myId,"]: Je suis une feuille");
 
                     }
 
@@ -159,16 +146,16 @@ module exskeleton;
 
                     if(i == (n/2)-1){
                         fg = cast(Noeud)filsg;
-                        writeln("[Son process ",myId,"]: Fils gauche ",fg.lid);
+                        writeln("[Son process AB ",myId,"]: Fils gauche ",fg.lid);
                         
                     } 
                     else if(i < (taille/2)) {
                         fg = cast(Noeud)filsg;
                         fd = cast(Noeud)filsd;
-                        writeln("[Son process ",myId,"]: Fils gauche ",fg.lid," et fils droit ",fd.lid);
+                        writeln("[Son process AB ",myId,"]: Fils gauche ",fg.lid," et fils droit ",fd.lid);
                     }
                     else{
-                        writeln("[Son process ",myId,"]: Je suis une feuille");
+                        writeln("[Son process AB ",myId,"]: Je suis une feuille");
 
 
                     }
@@ -180,10 +167,10 @@ module exskeleton;
                     if(i < (n/2)){
                         fg = cast(Noeud)filsg;
                         fd = cast(Noeud)filsd;
-                        writeln("[Son process ",myId,"]: Fils gauche ",fg.lid," et fils droit ",fd.lid);
+                        writeln("[Son process AB ",myId,"]: Fils gauche ",fg.lid," et fils droit ",fd.lid);
                     }
                     else{
-                        writeln("[Son process ",myId,"]: Je suis une feuille");
+                        writeln("[Son process AB ",myId,"]: Je suis une feuille");
 
                     }
 
@@ -196,7 +183,7 @@ module exskeleton;
         );
         
 
-
+    
 
 
 
@@ -235,7 +222,8 @@ module exskeleton;
                 }
         );
         }
-        writeln("[SonProcess ",myId,"]: Le leader final est ",leader," et le nombre de messages est ",msg);
+        writeln("[Son process unidirectional ",myId,"]: Le leader final est ",leader," et le nombre de messages est ",msg);
+
 
 
         
@@ -254,14 +242,15 @@ module exskeleton;
 
             int size = 1;
             
+
             int newId = 0;
 
             /* Envoie du premier message pour connaitre la taille de l'anneau */
 
-            writeln("[Son process init ",myId,"]: initialisation pour connaitre la taille de l'anneau...\r\n");
+            writeln("[Son process init unidirectional ",myId,"]: initialisation pour connaitre la taille de l'anneau...\r\n");
             send(localNeighbor.tid,size);
             receive((int tailleConnu){
-                writeln("[Son process init ",myId,"]: La taille de l'anneau est ",tailleConnu,". Renumérotation en cours...\r\n");
+                writeln("[Son process init unidirectional ",myId,"]: La taille de l'anneau est ",tailleConnu,". Renumérotation en cours...\r\n");
 
 
                 int cpt;
@@ -286,7 +275,7 @@ module exskeleton;
 
             receive((int taille){
                 taille += 1;
-                writeln("[Son process ",myId,"]: La taille est maintenant de ",taille);
+                writeln("[Son process unidirectional ",myId,"]: La taille est maintenant de ",taille);
                 send(localNeighbor.tid,taille);
 
             });
@@ -299,8 +288,8 @@ module exskeleton;
             if(newId == taille - 1){
                 myId = newId;
                 localNeighbor.lid = 0;
-                writeln("[Son process init ",myId,"]: Le voisin suivant a l'ID ",localNeighbor.lid,"\r\n");
-                writeln("[Son process init ",myId,"]: Fin du processus de renumérotation.");
+                writeln("[Son process init unidirectional ",myId,"]: Le voisin suivant a l'ID ",localNeighbor.lid,"\r\n");
+                writeln("[Son process init unidirectional ",myId,"]: Fin du processus de renumérotation.");
 
             }
             else{
@@ -309,7 +298,7 @@ module exskeleton;
                 if( newId < taille ){    
                     myId = newId - 1 ;
                     localNeighbor.lid = newId;
-                    writeln("[Son process ",myId,"]: Le voisin suivant a l'ID ",localNeighbor.lid);
+                    writeln("[Son process unidirectional ",myId,"]: Le voisin suivant a l'ID ",localNeighbor.lid);
                 // writeln("[Son process ",myId,"]: nouveau ID attribué au voisin ",cpt);
                 }
             }
@@ -321,12 +310,15 @@ module exskeleton;
 
 
 
+        send(ownerTid, msg);
 
-        // end of your code
 
-        send(ownerTid, CancelMessage());
+
+
+        
         
     }
+    
     
     
 
@@ -439,28 +431,26 @@ module exskeleton;
             }
         );
 
-
         
 
+    // end of your code
 
-
-
-
-
-
+        
 
 
 
     }
 
 
+
+
     void main()
     {
         // number of child processes
-        int n = 10;
-
+        int n = 20;
         int cpt ;
         int [] next = new int[n];
+        int nbMsg = 0;
 
         /* générer un tableau de random ID */
 
@@ -484,8 +474,7 @@ module exskeleton;
         
     
 
-
-        // spawn threads (child processes)
+        
         Noeud [] childTid = new Noeud[n];
         
         
@@ -500,7 +489,7 @@ module exskeleton;
 
 
 
-
+        
         
        
         // anneau bidirectionnel
@@ -518,6 +507,8 @@ module exskeleton;
             else if (i == 0){
                 immutable(Noeud) id_suiv = cast(immutable)childTid[i+1];
                 immutable(Noeud) id_prec = cast(immutable)childTid[n-1];
+
+            
                 send(childTid[i].tid, id_suiv,id_prec); 
 
             }
@@ -531,8 +522,11 @@ module exskeleton;
         
               
         }
+        
 
+        
 
+        
         
 
         // creation arbre binaire
@@ -691,7 +685,7 @@ module exskeleton;
 
         
         int idGrid = 0;
-        n = 4;
+        n = 6;
         auto childTidGrid = new Noeud[][](n,n);
 
         /* On atribue d'abord les ID pour chaque noeud de l'anneau */
@@ -838,13 +832,68 @@ module exskeleton;
         
 
        
+    
         
+
         
-
-
-
         
         // wait for all completions
-        receiveAllFinalization(childTid);
+        nbMsg = receiveAllFinalization(childTid);
+
+
+        /* a utiliser pour simuler les 100 executions */
+        
+        
+        //return nbMsg;
+        
+       
+        
 
     }
+
+
+
+    /+
+    void main(){
+        int [100] tab = 0 ;
+        int k = 100;
+        int sumMoyenne = 0;
+        
+
+        /* calcul de la somme des 100 messages e*/
+        for (int i = 0; i < k; i++){
+            // Execution du programme du dessus. modifier main => maintwo et return int dans le main
+           tab[i] =  maintwo();
+           sumMoyenne += tab[i];
+           
+        }
+        writeln(tab);
+
+        /* retrouvez les min et max */
+        int minV = tab[0];
+        int maxV = tab[0];
+        for (int i = 1; i < k; i++){
+
+            minV = min(minV,tab[i]);
+            maxV = max(maxV,tab[i]);            
+
+        }
+         
+           
+        
+
+        /* calcul des messages */
+        
+
+
+
+        writeln("Total: ",sumMoyenne);
+        sumMoyenne = sumMoyenne / 100;
+
+        writeln("Moyenne: ",sumMoyenne);
+        writeln("Min: ",minV);
+        writeln("Max: ",maxV);
+        
+
+    }
+    +/
