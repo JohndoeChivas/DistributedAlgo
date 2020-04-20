@@ -17,8 +17,6 @@ module exskeleton;
         int lid; //logical_ID
         int previousId;
         int nextId;
-        int leader;
-
         
         
     }
@@ -78,7 +76,44 @@ module exskeleton;
 
         
 
-        /* Arbre binaire */
+        
+
+     
+
+        
+        
+   
+
+
+
+
+
+       
+       
+        
+        // Verification anneau bidirectionnel  
+
+        send(localNeighbor.tid,myId);
+        receive
+        (
+        (int idVoisin)
+            {
+                
+                localNeighbor.previousId = myId;
+                localPrevious.nextId = myId;
+                /* résumé */
+                writeln("[Son Process ",myId,"]: ",localPrevious.lid," est l'ID du voisin precedent et ",localNeighbor.lid," est l'ID du voisin suivant");
+                
+                
+            }
+        );
+
+
+
+
+
+        // Vérification arbre binaire
+
         receive
         (
             
@@ -157,39 +192,14 @@ module exskeleton;
                 
             }
         );
-
-        
-        
-   
-
-
-
-
-
-       
-       
-
-       /* Anneau bidirectionnel  */
-
-
-        send(localNeighbor.tid,myId);
-        receive
-        (
-        (int idVoisin)
-            {
-                
-                localNeighbor.previousId = myId;
-                localPrevious.nextId = myId;
-                /* résumé */
-                writeln("[Son Process ",myId,"]: ",localPrevious.lid," est l'ID du voisin precedent et ",localNeighbor.lid," est l'ID du voisin suivant");
-                
-                
-            }
-        );
         
 
 
-         // CHANG ROBERT ALGO
+
+
+
+        // CHANG ROBERT ALGO
+
         bool leaderconnu = false;
         int leader = myId;
         int msg = 1;
@@ -231,7 +241,7 @@ module exskeleton;
 
 
 
-
+        
         
 
         // ALGO RENUMEROTATION 
@@ -246,45 +256,16 @@ module exskeleton;
 
             /* Envoie du premier message pour connaitre la taille de l'anneau */
 
-            writeln("\r\n\r\n[Son process init ",myId,"]: initialisation pour connaitre la taille de l'anneau...\r\n");
+            writeln("[Son process init ",myId,"]: initialisation pour connaitre la taille de l'anneau...\r\n");
             send(localNeighbor.tid,size);
             receive((int tailleConnu){
-                writeln("\r\n[Son process init ",myId,"]: La taille de l'anneau est ",tailleConnu,". Renumérotation en cours...\r\n");
+                writeln("[Son process init ",myId,"]: La taille de l'anneau est ",tailleConnu,". Renumérotation en cours...\r\n");
 
 
                 int cpt;
                 
                 int [] next = new int[tailleConnu];
 
-                
-                /+
-                /* génération d'un tableau de random d'entier de taille tailleConnu */
-                auto rnd = Random(unpredictableSeed);
-                for(int i = 0; i < n; ++i) 
-                {
-                    next[i]=i%n;
-                }
-
-                /* le do while n'est pas nécéssaire pour la génération random de nombre dans le tableau mais j'avais un probleme dans le main que je n'avais pas encore corrigé */
-                do {
-                    cpt = 0;
-                    next.randomShuffle(rnd);
-                    for(int i = 0 ;i < n ; i ++){
-                        if (next[i] == i){
-                            cpt += 1;
-                        }
-                    }
-
-                }while(cpt > 0);
-
-                //localNeighbor.lid = next[cpt];
-                +/
-                
-                    
-
-               
-                /* Debut renumérotation avec l'attribution du premier ID = 0 au voisin */
-                
                 
 
                 localNeighbor.lid = newId;
@@ -311,6 +292,7 @@ module exskeleton;
 
 
         receive((int newId ,int  taille){ 
+
             /* Changement des ID en restant cohérent avec la structure du noeud voisin */
             if(newId == taille - 1){
                 myId = newId;
@@ -337,126 +319,132 @@ module exskeleton;
 
 
 
-    
-
-
-
-
-
-
-
-
-
-
-       
-        /* CHANG ROBERT */
-
-        /* initialisation */
-
-    /*
-        bool leaderconnu = false;
-        int leader = myId;
-
-        send(localNeighbor.tid, leader ,false);
-        
-        
-        
-        while(leaderconnu == false)
-        {
-            // writeln(myId," en attente.");
-            receive(
-                (int j,bool candidat){
-                    if (candidat == false){
-                        if(leader > j ){
-                            leader = myId;
-                            //writeln("Process ",myId,": conservation leader ",leader);
-                            send(localNeighbor.tid,leader,false);
-                        }
-                        if(j > leader){
-                            leader = j ;
-                            //writeln("Process ",myId,": nouveau leader ",leader);
-                            send(localNeighbor.tid,leader,false);
-                        }
-                        else{
-                            leaderconnu = true;
-                            //writeln("Process ",myId,": le leader est ",leader);
-                            send(localNeighbor.tid,leader,true);
-                        }
-                    }
-                    else{
-                        
-                        leaderconnu  = true;
-                        send(localNeighbor.tid,leader,true);  
-                    }
-    
-
-                    
-                        
-                }
-        );
-        }
-
-        writeln("Process ",myId,": le leader final est ",leader);
-    
-    */
-
-    
-
-
-    /+ TRUE CODE
-        bool leaderconnu = false;
-        int leader = myId;
-        int msg = 1;
-        send(localNeighbor.tid, leader ,false);
-        
-        
-    while(leader != n){
-        while(leaderconnu == false)
-        {
-            // writeln(myId," en attente.");
-            receive(
-                (int j,bool b){
-
-                /* si l'id est la même alors le candidat est trouvé */
-                if (j == myId){ 
-                
-                    leader = myId;
-                    msg += 1;
-                    send(localNeighbor.tid, leader,true);
-
-            }
-            /* si l'id recu est plus grand que l'id candidat */
-            else if (j > myId){
-                /* on change de leader */
-                leader = j;
-                msg += 1;
-                send(localNeighbor.tid,leader, b);
-            }
-            leaderconnu = b;
-    
-
-                    
-                        
-                }
-        );
-        }
-
-    }
-
-        writeln("[SonProcess ",myId,"]: Le leader final est ",leader," et le nombre de messages est :",msg);
-
-
-    +/
-    
-
-
-
-
 
         // end of your code
 
         send(ownerTid, CancelMessage());
         
+    }
+    
+
+
+
+    // Fonction gérant les processus fils de la grille */
+
+    void spanwedGrid(int myId, int n){
+
+        Noeud gauche,droite,haut,bas;
+
+
+        receive
+        (
+        (immutable(Noeud) h,immutable(Noeud) b,immutable(Noeud) g,immutable(Noeud) d,int i,int j,int myId)
+            {
+            
+            if(i == 0){
+                /* coin frontiere haut gauche */
+                if(j == 0){
+                    bas = cast(Noeud)b;
+                    droite = cast(Noeud)d;
+                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",d.lid," et ",b.lid);
+                }
+                /* coin frontiere haut droite */
+                else if(j == n-1){
+                    gauche = cast(Noeud)g;
+                    bas = cast(Noeud)b;
+                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",g.lid," et ",h.lid);
+
+                }
+                /* frontiere gauche */
+                else if(j < n-1){
+                    haut = cast(Noeud)h;
+                    bas = cast(Noeud)b;
+                    droite = cast(Noeud)d;
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",d.lid," et ",b.lid);
+                }
+
+            }
+            else if (i == n-1){
+                /* coin frontiere haut droite */
+                if(j == 0){
+                    gauche = cast(Noeud)g;
+                    bas = cast(Noeud)b;
+                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",g.lid," et ",b.lid);
+                }
+                /* coin frontiere bas droite */
+                else if(j == n-1){
+                    haut = cast(Noeud)h;
+                    gauche = cast(Noeud)g;
+                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",h.lid," et ",g.lid);
+
+                }
+                /* frontiere droite */
+                else if(j < n-1){
+                    haut = cast(Noeud)h;
+                    gauche = cast(Noeud)g;
+                    bas = cast(Noeud)b;
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",g.lid," et ",b.lid);
+                }
+
+            }
+
+            else if(j == 0){
+
+                /* frontiere haut */
+                if(i > 0 && i < n-1){
+                    gauche = cast(Noeud)g;
+                    droite = cast(Noeud)d;
+                    bas = cast(Noeud)b;
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",g.lid,", ",d.lid," et ",b.lid);
+                }
+
+            }
+            else if(j == n - 1){
+                
+                /* frontiere bas */
+                if(i > 0  && i < n -1){
+                    haut = cast(Noeud)h;
+                    gauche = cast(Noeud)g;
+                    droite = cast(Noeud)d;
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",g.lid," et ",d.lid);
+
+
+                }
+            }
+
+            /* sinon a l'interieur de la grille */
+            else{
+                haut = cast(Noeud)h;
+                droite = cast(Noeud)d;
+                gauche = cast(Noeud)g;
+                bas = cast(Noeud)b;
+                writeln("[Son process grid ",myId,"]: 4 voisins cases: ",h.lid,", ",g.lid,", ",d.lid,", ",b.lid);
+
+            }
+
+
+            
+                
+                
+
+
+
+
+            }
+        );
+
+
+        
+
+
+
+
+
+
+
+
+
+
     }
 
 
@@ -473,31 +461,27 @@ module exskeleton;
         
         auto rnd = Random(unpredictableSeed);
         
-        /*
+       
+        
         for(int i = 0; i < n; ++i) 
         {
-            next[i]=i%n;
+            next[i]=i;
         }
-        */
 
         
-for(int i = 0; i < n; ++i) 
-    {
-    next[i]=i;
-    }
-
-   next.randomShuffle(rnd);
-   writeln(next);
+        next.randomShuffle(rnd);
+        writeln(next,"\r\n");
 
         
         
 
         
-       
+    
 
 
         // spawn threads (child processes)
         Noeud [] childTid = new Noeud[n];
+        /+
 
         for(int i = 0; i < n; ++i)
         {
@@ -545,7 +529,7 @@ for(int i = 0; i < n; ++i)
 
         
 
-        // create binary tree
+        // creation arbre binaire
         
 
         // cas spécifique si la taille de l'arbre binaire est inférieure a 4
@@ -685,11 +669,172 @@ for(int i = 0; i < n; ++i)
         }
         }
 
+        +/
+
+
+
+
         
 
         
+
+        // child grille processus
+
+
+        //  CODE DE LA TOPOLOGIE EN GRILLE 
+
+        
+        int idGrid = 0;
+        n = 4;
+        auto childTidGrid = new Noeud[][](n,n);
+
+        /* On atribue d'abord les ID pour chaque noeud de l'anneau */
+
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0 ;j <n ; j++){
+                childTidGrid[i][j].tid = spawn(&spanwedGrid,idGrid,n);
+                childTidGrid[i][j].lid = idGrid;
+                idGrid += 1;
+            }
+        }
+        
+
+        /* Ensuite on envoie leurs voisins selon leur place */
+
+        for(int i = 0 ;i < n; i++){
+            for(int j = 0 ; j<n;j++){
+            
+                
+                
+        if(i == 0){
+
+                    /* coin haut gauche de la grille 2 voisins */
+            if(j == 0){
+
+                immutable(Noeud) h ;
+                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) g ;
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
+                
+            }
+
+
+            /* coin bas gauche de la grille 2 voisins */
+            else if(j == n-1){
+
+                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
+                immutable(Noeud) b ;
+                immutable(Noeud) d ;
+                immutable(Noeud) g = cast(immutable)childTidGrid[i+1][j];
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);                        
+            }
+
+
+            /* sinon 3 voisins */
+            else{
+                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
+                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) g ;
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid); 
+
+            }
+        }
+
+        else if (i == n -1 ){
+
+            /* coin haut droite de la grille 2 voisins */
+            if (j == 0 ){
+                immutable(Noeud) h ;
+                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) d ;
+                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
+                
+            }
+
+
+            /* coin bas droite de la grille 2 voisins */
+            else if(j == n -1){
+
+                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
+                immutable(Noeud) b ;
+                immutable(Noeud) d;
+                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);    
+
+            }
+
+            /* sinon 3 voisins */
+            else{
+                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
+                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) d ;
+                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
+
+            }
+
+        }
+                
+        else if (j == 0){
+
+            /* frontiere en haut mais pas aux extremités des lignes */
+            if(i > 0 && i < n -1){
+                
+                immutable(Noeud) h ;
+                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
+
+            }
+                                
+        }
+        else if(j == n-1){
+
+            /* frontiere en bas mais pas aux extremités des lignes */
+            if(i > 0 && i < n -1){
+                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
+                immutable(Noeud) b ;
+                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
+
+            }
+        }
+
+
+                /* sinon noeud qui ne sont pas a la frontiere */
+        else{
+
+                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
+                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
+            
+
+        }
+        
+            }
+        }
+
+
+                
+                
+            
+            
+        
+
+       
         
         
+
+
+
         
         // wait for all completions
         receiveAllFinalization(childTid);
