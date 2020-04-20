@@ -30,6 +30,8 @@ module exskeleton;
             receiveOnly!CancelMessage();
     }
 
+    
+
     void spawnedFunc(int myId, int n)
     {
         
@@ -326,6 +328,7 @@ module exskeleton;
         
     }
     
+    
 
 
 
@@ -352,61 +355,64 @@ module exskeleton;
                 else if(j == n-1){
                     gauche = cast(Noeud)g;
                     bas = cast(Noeud)b;
-                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",g.lid," et ",h.lid);
+                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",g.lid," et ",b.lid);
 
                 }
-                /* frontiere gauche */
+                /* frontiere haut */
                 else if(j < n-1){
-                    haut = cast(Noeud)h;
+
+                    gauche = cast(Noeud)g;
                     bas = cast(Noeud)b;
                     droite = cast(Noeud)d;
-                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",d.lid," et ",b.lid);
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",g.lid,", ",d.lid," et ",b.lid);
                 }
 
             }
             else if (i == n-1){
-                /* coin frontiere haut droite */
+                /* coin frontiere bas gauche */
                 if(j == 0){
-                    gauche = cast(Noeud)g;
-                    bas = cast(Noeud)b;
-                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",g.lid," et ",b.lid);
+                    
+                    haut = cast(Noeud)g;
+                    droite = cast(Noeud)b;
+                    writeln("[Son process grid ",myId,"]: 2 voisins cases: ",h.lid," et ",d.lid);
                 }
                 /* coin frontiere bas droite */
                 else if(j == n-1){
+
                     haut = cast(Noeud)h;
                     gauche = cast(Noeud)g;
                     writeln("[Son process grid ",myId,"]: 2 voisins cases: ",h.lid," et ",g.lid);
 
                 }
-                /* frontiere droite */
+                /* frontiere bas */
                 else if(j < n-1){
                     haut = cast(Noeud)h;
                     gauche = cast(Noeud)g;
-                    bas = cast(Noeud)b;
-                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",g.lid," et ",b.lid);
+                    droite = cast(Noeud)d;
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",g.lid," et ",d.lid);
                 }
 
             }
 
             else if(j == 0){
 
-                /* frontiere haut */
+                /* frontiere gauche */
                 if(i > 0 && i < n-1){
-                    gauche = cast(Noeud)g;
+                    haut = cast(Noeud)h;
                     droite = cast(Noeud)d;
                     bas = cast(Noeud)b;
-                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",g.lid,", ",d.lid," et ",b.lid);
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",d.lid," et ",b.lid);
                 }
 
             }
             else if(j == n - 1){
                 
-                /* frontiere bas */
+                /* frontiere droite */
                 if(i > 0  && i < n -1){
                     haut = cast(Noeud)h;
                     gauche = cast(Noeud)g;
-                    droite = cast(Noeud)d;
-                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",g.lid," et ",d.lid);
+                    bas = cast(Noeud)b;
+                    writeln("[Son process grid ",myId,"]: 3 voisins cases: ",h.lid,", ",g.lid," et ",b.lid);
 
 
                 }
@@ -481,8 +487,8 @@ module exskeleton;
 
         // spawn threads (child processes)
         Noeud [] childTid = new Noeud[n];
-        /+
-
+        
+        
         for(int i = 0; i < n; ++i)
         {
             childTid[i].tid = spawn(&spawnedFunc, next[i], n);
@@ -669,8 +675,8 @@ module exskeleton;
         }
         }
 
-        +/
-
+        
+        
 
 
 
@@ -713,31 +719,30 @@ module exskeleton;
             if(j == 0){
 
                 immutable(Noeud) h ;
-                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
-                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) b = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i][j+1];
                 immutable(Noeud) g ;
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
                 
             }
 
 
-            /* coin bas gauche de la grille 2 voisins */
+            /* coin haut droite de la grille 2 voisins */
             else if(j == n-1){
-
-                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
-                immutable(Noeud) b ;
+                immutable(Noeud) h ;
+                immutable(Noeud) b = cast(immutable)childTidGrid[i+1][j];
                 immutable(Noeud) d ;
-                immutable(Noeud) g = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i][j-1];
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);                        
             }
 
 
-            /* sinon 3 voisins */
+            /* sinon extrémité haut 3 voisins */
             else{
-                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
-                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
-                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
-                immutable(Noeud) g ;
+                immutable(Noeud) h ;
+                immutable(Noeud) b = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i][j-1];
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid); 
 
             }
@@ -745,12 +750,13 @@ module exskeleton;
 
         else if (i == n -1 ){
 
-            /* coin haut droite de la grille 2 voisins */
+            /* coin bas gauche de la grille 2 voisins */
             if (j == 0 ){
-                immutable(Noeud) h ;
-                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
-                immutable(Noeud) d ;
-                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+
+                immutable(Noeud) h = cast(immutable)childTidGrid[i-1][j]; 
+                immutable(Noeud) b ;
+                immutable(Noeud) d = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) g ; 
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
                 
             }
@@ -759,20 +765,21 @@ module exskeleton;
             /* coin bas droite de la grille 2 voisins */
             else if(j == n -1){
 
-                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
+                immutable(Noeud) h = cast(immutable)childTidGrid[i-1][j];
                 immutable(Noeud) b ;
                 immutable(Noeud) d;
-                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i][j-1];
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);    
 
             }
 
-            /* sinon 3 voisins */
+            /* extremité bas de la grille 3 voisins */
             else{
-                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
-                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
-                immutable(Noeud) d ;
-                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+
+                immutable(Noeud) h = cast(immutable)childTidGrid[i-1][j];
+                immutable(Noeud) b ;
+                immutable(Noeud) d = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i][j-1];
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
 
             }
@@ -781,13 +788,13 @@ module exskeleton;
                 
         else if (j == 0){
 
-            /* frontiere en haut mais pas aux extremités des lignes */
+            /* frontiere a gauche mais pas aux extremités de la colonne */
             if(i > 0 && i < n -1){
                 
-                immutable(Noeud) h ;
-                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
-                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
-                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                immutable(Noeud) h = cast(immutable)childTidGrid[i-1][j];
+                immutable(Noeud) b = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) g ;
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
 
             }
@@ -795,12 +802,13 @@ module exskeleton;
         }
         else if(j == n-1){
 
-            /* frontiere en bas mais pas aux extremités des lignes */
+            /* frontiere a droite mais pas aux extremités de la colonne  */
             if(i > 0 && i < n -1){
-                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
-                immutable(Noeud) b ;
-                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
-                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+
+                immutable(Noeud) h = cast(immutable)childTidGrid[i-1][j];
+                immutable(Noeud) b = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) d ;
+                immutable(Noeud) g = cast(immutable)childTidGrid[i][j-1];
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
 
             }
@@ -810,10 +818,10 @@ module exskeleton;
                 /* sinon noeud qui ne sont pas a la frontiere */
         else{
 
-                immutable(Noeud) h = cast(immutable)childTidGrid[i][j-1];
-                immutable(Noeud) b = cast(immutable)childTidGrid[i][j+1];
-                immutable(Noeud) d = cast(immutable)childTidGrid[i+1][j];
-                immutable(Noeud) g = cast(immutable)childTidGrid[i-1][j];
+                immutable(Noeud) h = cast(immutable)childTidGrid[i-1][j];
+                immutable(Noeud) b = cast(immutable)childTidGrid[i+1][j];
+                immutable(Noeud) d = cast(immutable)childTidGrid[i][j+1];
+                immutable(Noeud) g = cast(immutable)childTidGrid[i][j-1];
                 send(childTidGrid[i][j].tid, h,b,g,d,i,j,childTidGrid[i][j].lid);
             
 

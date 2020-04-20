@@ -38,7 +38,6 @@ Q2)
 
 EXERCICE 4 
 
+Remarque pour l'arbre binaire et la grille : obligé d'envoyer 2 fils pour l'AB et 4 voisins pour la grille, même si au reçu les processus initialise le nombre de fils et le nombre de voisins en fonction de l'indice i pour l'arbre binaire, et de l'indice i et j pour la grille.
 
-Remarque:
-La topologie de la grille ne marche pas du fait que les tableaux multidimensionnels ont l'air de marcher différemment du C++ en langage D.
-J'ai donc mis le code en commentaire mais je pesne que le raisonnement était quand même bon. :)
+
